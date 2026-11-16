@@ -1,19 +1,3 @@
-"""
-outreach.py - send approved DMs safely, and pick up replies.
-
-Before EVERY send:
-  1. db.claim_for_sending()  - atomic approved -> sending (double-click / two tabs safe),
-                               also re-checks the do-not-contact list
-  2. daily cap               - stop when DAILY_SEND_CAP DMs went out today
-  3. X conversation check    - if ANY DM already exists with this person (e.g. someone
-                               messaged them by hand), don't send; park for review
-Then send, pause a randomised interval, next.
-
-Outcomes are always recorded:
-  sent | dm_closed (they don't accept DMs - never retried) | failed (human can re-approve)
-  | needs_review (unknown outcome, e.g. timeout - never auto-retried)
-  rate limit / credits / auth -> nothing was sent, contact goes back to 'approved', run stops.
-"""
 import os
 import random
 import time

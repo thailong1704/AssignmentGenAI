@@ -1,19 +1,3 @@
-"""
-pipeline.py - find people, decide if they fit, draft a DM grounded in real posts.
-
-  discover_from_seeds / discover_from_search
-        -> new rows in contacts (dedup + do-not-contact handled by db)
-  free bio pre-filter
-        -> people with no AI/robotics signal in their bio are skipped BEFORE we
-           pay to read their posts (can be analysed manually anyway)
-  analyse(contact)
-        -> read recent posts -> ONE LLM call (score + reason + evidence + draft)
-        -> code-level checks: evidence IDs must be real posts we fetched,
-           banned "fake familiarity" phrases flagged; no evidence => 'generic'
-
-The LLM never sees anything we didn't fetch from X, and its claims about
-evidence are verified by code, not trusted.
-"""
 import json
 import os
 import re

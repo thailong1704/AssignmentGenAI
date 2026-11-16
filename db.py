@@ -1,20 +1,3 @@
-r"""
-db.py - the single source of truth.
-
-Everything that matters for "never double-message anyone" lives here:
-  * one row per X user (UNIQUE x_user_id)
-  * status changes are guarded by WHERE status = <expected>, so two clicks /
-    two processes can never both move the same contact into 'sending'
-  * do-not-contact list checked on insert and again before sending
-  * every action is written to `events` (audit log) and every API call's
-    estimated cost to `api_usage`
-
-Contact lifecycle:
-  found -> drafted -> approved -> sending -> sent -> replied
-                 \-> rejected          \-> dm_closed   (recipient doesn't accept DMs)
-                                       \-> failed      (other API error, retryable by a human)
-                                       \-> needs_review (crash/unknown outcome: never auto-resent)
-"""
 import json
 import sqlite3
 import time

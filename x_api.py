@@ -1,15 +1,3 @@
-"""
-x_api.py - the ONLY place that talks to X.
-
-* OAuth 2.0 (PKCE) login, token storage (in db) and automatic refresh
-* thin wrappers for the endpoints we use, with errors classified into a few
-  kinds the UI can explain (auth / credits / rate_limited / dm_closed / ...)
-* estimated cost of every call logged to db.api_usage
-* DRY_RUN mode: same functions, answered from fixtures.json - nothing leaves
-  the machine, nothing is billed, no DM is sent.
-
-Official endpoints only, no scraping.
-"""
 import base64
 import hashlib
 import json
