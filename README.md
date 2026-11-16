@@ -9,7 +9,6 @@ A small local web app that finds AI and robotics builders on X, explains why eac
 **Requirements:** Python 3.10 or newer.
  
 ```bash
-
 git clone https://github.com/thailong1704/AssignmentGenAI && cd AssignmentGenAI
 python -m venv .venv
 # Windows: .venv\Scripts\activate     macOS/Linux: source .venv/bin/activate
@@ -32,6 +31,7 @@ Then add your keys to `.env` (below), restart `python main.py`, open **http://12
 4. Add a few dollars of credit and set a **spending limit** in the console.
 5. In `.env`, set `OPENAI_API_KEY` and `SENDER_NAME`, then restart `python main.py`.
 6. Click **Connect X** and authorize with the account you'll send from.
+
 > The **"Send approved"** button sends real DMs. For testing, use accounts you control or people who have agreed to receive a test message.
  
 No keys yet? Set `DRY_RUN=1` in `.env` to try it with sample data (seed: `demo_seed_sea`).
@@ -65,7 +65,7 @@ seed accounts / topic ──► discovery ──► free bio filter ──► re
                                    │
    send queue ─► atomic claim ─► daily cap ─► "any DM history with this person?" ─► send ─► log
                                    │
-             replies synced from DM events ─► "Needs attention"
+             replies synced (DMs + encrypted chat) ─► "Needs attention"
 ```
  
 | File | Role |
@@ -81,12 +81,14 @@ seed accounts / topic ──► discovery ──► free bio filter ──► re
 - Each connected account has its own database `data/account_<x_user_id>.db`: its own people, drafts, history, do-not-contact list and costs. Switching accounts never shows or sends another account's data. Disconnecting keeps the data, and it comes back on reconnect.
 - Login tokens live separately in `data/app.db`; dry-run data lives in `data/demo.db`. The whole `data/` folder is git-ignored.
 - An `outreach.db` from an older version is moved automatically to the account recorded in it.
+
 ### How double-messaging is prevented
 1. The database allows **one row per X user**. People found again are ignored.
 2. Sending starts with an **atomic `approved → sending` claim**. Double clicks, two browser tabs or two workers cannot both win it; this is tested with 20 concurrent threads.
 3. Before every send, the tool **asks X whether any DM history already exists** with that person. If someone messaged them by hand, the tool does not send and moves them to *Needs review*.
 4. If a send is interrupted (crash or timeout), the outcome is unknown, so the contact goes to **Needs review and is never resent automatically**.
 5. The **do-not-contact list** is checked at discovery time and again at send time. You can import people already contacted outside the tool from a CSV.
+
 ### What it refuses to do, and what you will see
 | Situation | What happens |
 |---|---|
@@ -117,10 +119,11 @@ OpenAI `gpt-4.1-mini` costs roughly $0.001 per person. Live spend (X + OpenAI co
 - Topic search only covers the **last 7 days** (an X pay-per-use limit).
 - **Encrypted X Chat:** replies sent through X's end-to-end encrypted Chat are detected from the Chat API's event metadata (sender and time); their text is ciphertext, so the tool shows "replied in encrypted chat — open on X to read" and never tries to decrypt. The pre-send "existing conversation" check uses the classic DM history; encrypted messages someone sent by hand outside the tool may not be seen there. Messages sent *by this tool* are always tracked in the database, so the tool itself never double-messages. **Mark as replied** remains as a manual fallback.
 - Reply detection reads recent DM events (roughly the last 30 days). Click **Check for replies**; it does not poll in the background.
-- Single user, single X account, runs locally. No hosted multi-user version.
+- Runs locally with one connected X account at a time (data is kept per account). No hosted team version yet.
+- Scoring does not use location yet, so results can include strong builders outside Southeast Asia.
 - No automatic follow-ups. A second message to the same person is deliberately impossible in this version.
+
 ## Tests
 ```bash
 python -m pytest -q tests      # 31 tests, offline with sample data: dedup, concurrency, caps, errors, replies (incl. encrypted chat), per-account isolation, UI click-through
 ```
- 
