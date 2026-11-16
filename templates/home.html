@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Find people</h1>
+<p class="sub">Give seed accounts (we look at who they follow) and/or a topic (we look at recent posts). Each person is scored and gets a draft DM that cites a real post — nothing is sent until you approve it.</p>
+
+{% if not acct and not dry_run %}
+<div class="flash error">Not connected to X. Click <b>Connect X</b> (top right) and authorize with the account you'll send from.</div>
+{% endif %}
+
+<div class="card">
+<form method="post" action="/find">
+  <label>Seed accounts </label>
+  <textarea name="seeds" ></textarea>
+  <label>Topic search (posts from the last 7 days) <span class="hint">— optional. X search syntax works.</span></label>
+  <input type="text" name="query">
+  <label>Campaign focus <span class="hint">— optional, steers scoring and drafts.</span></label>
+  <input type="text" name="focus">
+  <div class="grid" style="margin-top:6px">
+    <div><label>Max people per seed / search</label><input type="number" name="max_per_seed" value="50" min="5" max="500"></div>
+    <div><label>Max to analyse now</label><input type="number" name="analyse_limit" value="25" min="1" max="200"></div>
+  </div>
+  <p class="small muted">Rough cost (live): reading who a seed follows ≈ $0.01/person · analysing one person ≈ $0.08 (15 posts) + ~$0.001 OpenAI. People whose bio shows no AI/robotics signal are skipped for free.</p>
+  <button class="primary" {{ 'disabled' if job.running }}>Find & analyse</button>
+</form>
+</div>
+
+<h2>Status</h2>
+<div class="grid">
+  <div class="card stat"><b>{{ counts.drafted }}</b><span>drafts to review</span></div>
+  <div class="card stat"><b>{{ counts.approved }}</b><span>approved, waiting to send</span></div>
+  <div class="card stat"><b>{{ sent_today }} / {{ cap }}</b><span>sent today (daily cap)</span></div>
+  <div class="card stat"><b>{{ counts.sent + counts.replied }}</b><span>sent total</span></div>
+  <div class="card stat"><b>{{ counts.replied }}</b><span>replied</span></div>
+  <div class="card stat"><b>${{ '%.2f'|format(cost.today) }}</b><span>API spend today (${{ '%.2f'|format(cost.total) }} total{% if dry_run %}, dry-run not billed{% endif %})</span></div>
+</div>
+<p class="small muted">LLM: {{ model }} {% if llm_live %}(live){% else %}(simulated — set OPENAI_API_KEY{% if dry_run %} and LLM_DRY_RUN=0{% endif %} for real drafts){% endif %} · minimum fit score {{ min_score }}/10 · last reply sync: {{ (last_sync | local ~ ' ' ~ TZ) if last_sync else 'never' }}</p>
+
+<h2>Recent activity</h2>
+<table>
+  <tr><th>When ({{ TZ }})</th><th>Who</th><th>What</th></tr>
+  {% for e in events %}
+  <tr><td class="small muted">{{ e.created_at | local }}</td><td>{{ '@' ~ e.username if e.username else '' }}</td><td>{{ e.type.replace('_',' ') }} <span class="small muted">{{ (e.detail or '')[:120] }}</span></td></tr>
+  {% else %}<tr><td colspan="3" class="muted">Nothing yet.</td></tr>{% endfor %}
+</table>
+{% endblock %}

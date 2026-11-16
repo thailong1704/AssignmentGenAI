@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>X Outreach · GenAI Fund</title>
+<style>
+  :root { --bg:#f7f7f5; --card:#fff; --ink:#1d1d1b; --muted:#6b6b66; --line:#e4e3de;
+          --accent:#2f5d50; --ok:#2e7d32; --warn:#b26a00; --err:#b3261e; --info:#33577a; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.5 -apple-system, "Segoe UI", Roboto, sans-serif; background:var(--bg); color:var(--ink); }
+  header { background:var(--card); border-bottom:1px solid var(--line); padding:10px 24px; display:flex; gap:20px; align-items:center; flex-wrap:wrap; }
+  header .brand { font-weight:700; }
+  nav a { color:var(--muted); text-decoration:none; margin-right:14px; }
+  nav a.on, nav a:hover { color:var(--ink); }
+  .pill { display:inline-block; padding:1px 8px; border-radius:999px; font-size:12px; background:#eee; color:var(--muted); }
+  .pill.dry { background:#fff4e0; color:var(--warn); } .pill.live { background:#e6f2ea; color:var(--ok); }
+  .pill.err { background:#fbe9e7; color:var(--err); } .pill.badge { background:var(--err); color:#fff; }
+  .right { margin-left:auto; display:flex; gap:10px; align-items:center; }
+  main { max-width:1100px; margin:20px auto; padding:0 24px 60px; }
+  h1 { font-size:20px; margin:0 0 4px; } h2 { font-size:16px; margin:28px 0 10px; }
+  .sub { color:var(--muted); margin:0 0 16px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px; margin-bottom:12px; }
+  .grid { display:grid; gap:12px; grid-template-columns:repeat(auto-fit, minmax(150px,1fr)); }
+  .stat b { display:block; font-size:22px; } .stat span { color:var(--muted); font-size:12px; }
+  label { display:block; font-weight:600; margin:10px 0 4px; } .hint { color:var(--muted); font-weight:400; font-size:12px; }
+  input[type=text], input[type=number], textarea { width:100%; padding:8px 10px; border:1px solid var(--line); border-radius:8px; font:inherit; background:#fff; }
+  textarea { min-height:90px; }
+  button, .btn { display:inline-block; border:1px solid var(--line); background:#fff; padding:6px 12px; border-radius:8px; font:inherit; cursor:pointer; text-decoration:none; color:var(--ink); }
+  button.primary { background:var(--accent); color:#fff; border-color:var(--accent); }
+  button.danger { color:var(--err); } button:disabled { opacity:.5; cursor:not-allowed; }
+  form.inline { display:inline; }
+  .flash { padding:10px 14px; border-radius:8px; margin-bottom:14px; }
+  .flash.info { background:#eaf1f8; color:var(--info); } .flash.ok { background:#e6f2ea; color:var(--ok); } .flash.error { background:#fbe9e7; color:var(--err); }
+  table { width:100%; border-collapse:collapse; background:var(--card); border:1px solid var(--line); border-radius:10px; overflow:hidden; }
+  th, td { text-align:left; padding:8px 10px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { font-size:12px; color:var(--muted); font-weight:600; background:#fbfbf9; }
+  .muted { color:var(--muted); } .small { font-size:12px; }
+  .person { display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+  .person a { color:var(--ink); font-weight:600; }
+  .score { font-weight:700; font-size:18px; }
+  .evidence { border-left:3px solid var(--accent); padding:4px 10px; margin:8px 0; background:#f4f8f6; font-size:13px; }
+  .warn { color:var(--warn); white-space:pre-line; font-size:13px; }
+  .actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+  #job { position:sticky; top:0; z-index:5; }
+  .joblog { font:12px/1.5 ui-monospace, monospace; max-height:180px; overflow:auto; white-space:pre-wrap; margin-top:6px; }
+  .st { font-size:12px; padding:1px 8px; border-radius:999px; background:#eee; }
+  .st.sent{background:#e6f2ea;color:var(--ok)} .st.replied{background:#e3ecf7;color:var(--info)}
+  .st.dm_closed,.st.failed{background:#fbe9e7;color:var(--err)} .st.needs_review{background:#fff4e0;color:var(--warn)}
+</style>
+</head>
+<body>
+<header>
+  <span class="brand">X Outreach</span>
+  {% if acct or dry_run %}<nav>
+    {% set p = request.url.path %}
+    <a href="/" class="{{ 'on' if p == '/' }}">Home</a>
+    <a href="/review" class="{{ 'on' if p == '/review' }}">Review {% if counts.drafted %}<span class="pill">{{ counts.drafted }}</span>{% endif %}</a>
+    <a href="/sent" class="{{ 'on' if p == '/sent' }}">Sent</a>
+    <a href="/attention" class="{{ 'on' if p == '/attention' }}">Needs attention {% if attention %}<span class="pill badge">{{ attention }}</span>{% endif %}</a>
+    <a href="/people" class="{{ 'on' if p == '/people' }}">People</a>
+    <a href="/log" class="{{ 'on' if p == '/log' }}">Log</a>
+  </nav>{% endif %}
+  <div class="right">
+    {% if dry_run %}<span class="pill dry" title="No calls to X, nothing sent or billed">DRY RUN</span>
+    {% else %}<span class="pill live">LIVE</span>{% endif %}
+    {% if acct %}<span class="small">@{{ acct[1] }}</span>
+      {% if not dry_run %}<form class="inline" method="post" action="/disconnect"><button class="small">Disconnect</button></form>{% endif %}
+    {% else %}<a class="btn" href="/connect">Connect X</a>{% endif %}
+  </div>
+</header>
+<main>
+  <div id="job">{% include "_job.html" %}</div>
+  {% if missing_scopes %}<div class="flash error">Your X login is missing permissions: <b>{{ missing_scopes|join(', ') }}</b>. Click Disconnect, then Connect X again.</div>{% endif %}
+  {% if msg %}<div class="flash {{ kind }}">{{ msg }}</div>{% endif %}
+  {% block content %}{% endblock %}
+</main>
+<script>
+  // A flash message is shown once: drop it from the address bar so a reload or
+  // coming back to this page doesn't show it again.
+  if (location.search.includes('msg=')) history.replaceState(null, '', location.pathname);
+</script>
+<script>
+  // While a background job runs, poll its status; reload the page when it finishes.
+  (function () {
+    let wasRunning = {{ 'true' if job.running else 'false' }};
+    async function tick() {
+      const r = await fetch('/job'); const html = await r.text();
+      document.getElementById('job').innerHTML = html;
+      const running = html.includes('data-running="1"');
+      if (wasRunning && !running) { location.href = location.pathname; return; }
+      wasRunning = running;
+      if (running) setTimeout(tick, 1500);
+    }
+    if (wasRunning) setTimeout(tick, 1500);
+  })();
+</script>
+</body>
+</html>

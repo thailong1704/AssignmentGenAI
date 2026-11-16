@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Activity log</h1>
+<p class="sub">Every action, by the tool or by you. Last 300 events.</p>
+<table>
+  <tr><th>When ({{ TZ }})</th><th>Who</th><th>Event</th><th>Detail</th></tr>
+  {% for e in events %}
+  <tr><td class="small muted">{{ e.created_at | local(true) }}</td><td>{{ '@' ~ e.username if e.username else '' }}</td>
+      <td>{{ e.type.replace('_',' ') }}</td><td class="small muted">{{ (e.detail or '')[:200] }}</td></tr>
+  {% else %}<tr><td colspan="4" class="muted">Nothing yet.</td></tr>{% endfor %}
+</table>
+
+<h2>API spend by endpoint (live calls only)</h2>
+<p class="small muted">Estimated with X's billing rules: each post, user or DM event is charged once per UTC day, and reading your own account's posts or following list uses the cheaper "owned reads" rate. Totals include OpenAI. Your X developer console is the source of truth for X charges.</p>
+<table>
+  <tr><th>Endpoint</th><th>Units</th><th>Est. cost</th></tr>
+  {% for r in cost.by_endpoint %}<tr><td>{{ r.endpoint }}</td><td>{{ r.units }}</td><td>${{ r.cost }}</td></tr>
+  {% else %}<tr><td colspan="3" class="muted">No billable calls yet.</td></tr>{% endfor %}
+</table>
+{% endblock %}

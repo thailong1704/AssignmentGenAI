@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="person">
+  <div><h1>Needs attention</h1><p class="sub">Replies to answer, and anything the tool refused or couldn't finish.</p></div>
+  <form method="post" action="/sync"><input type="hidden" name="back" value="/attention"><button class="primary" {{ 'disabled' if not acct }}>Check for replies</button></form>
+</div>
+
+<h2>Replied ({{ replied|length }})</h2>
+{% for c in replied %}
+<div class="card">
+  <div class="person"><a href="https://x.com/{{ c.username }}" target="_blank">@{{ c.username }}</a><span class="small muted">{{ c.replied_at | local }} {{ TZ }}</span></div>
+  {% if c.reply_text and c.reply_text.startswith("Replied in X's encrypted chat") %}
+  <div class="evidence"><b>Replied in encrypted chat</b> — X doesn't let apps read the text. Open the conversation on X to read and answer.</div>
+  {% else %}<div class="evidence"><b>They said:</b> {{ c.reply_text }}</div>{% endif %}
+  <div class="small muted">We sent: {{ c.final_text }}</div>
+  <div class="actions">
+    <a class="btn" href="https://x.com/messages/{{ c.dm_conversation_id }}" target="_blank">Reply on X</a>
+    <form class="inline" method="post" action="/contact/{{ c.id }}/dnc"><button class="danger">They declined — do not contact</button></form>
+  </div>
+</div>
+{% else %}<div class="card muted">No replies yet. Click "Check for replies".</div>{% endfor %}
+
+<h2>Needs review ({{ review|length }})</h2>
+<p class="small muted">The tool stopped because it couldn't be sure (an existing conversation was found, or sending was interrupted). It will never resend these on its own.</p>
+{% for c in review %}
+<div class="card">
+  <a href="https://x.com/{{ c.username }}" target="_blank">@{{ c.username }}</a> <span class="warn">{{ c.last_error }}</span>
+  <div class="small muted">{{ c.final_text }}</div>
+  <div class="actions">
+    <a class="btn" href="https://x.com/messages/{{ c.x_user_id }}-{{ acct[0] if acct else '' }}" target="_blank">Check conversation on X</a>
+    <form class="inline" method="post" action="/contact/{{ c.id }}/resolve"><input type="hidden" name="outcome" value="sent"><button>It was sent / already in touch</button></form>
+    <form class="inline" method="post" action="/contact/{{ c.id }}/mark_replied"><button>They replied</button></form>
+    <form class="inline" method="post" action="/contact/{{ c.id }}/resolve"><input type="hidden" name="outcome" value="drop"><button>Drop</button></form>
+  </div>
+</div>
+{% else %}<div class="card muted">Nothing to review.</div>{% endfor %}
+
+<h2>Failed ({{ failed|length }})</h2>
+{% for c in failed %}
+<div class="card">
+  <a href="https://x.com/{{ c.username }}" target="_blank">@{{ c.username }}</a> <span class="warn">{{ c.last_error }}</span>
+  <div class="actions">
+    <form class="inline" method="post" action="/contact/{{ c.id }}/reapprove"><button>Retry (re-approve)</button></form>
+    <form class="inline" method="post" action="/contact/{{ c.id }}/reject"><input type="hidden" name="back" value="/attention"><button>Drop</button></form>
+  </div>
+</div>
+{% else %}<div class="card muted">No failures.</div>{% endfor %}
+
+<h2>DMs closed ({{ closed|length }})</h2>
+<p class="small muted">These people don't accept DMs from your account. The tool won't retry — reach them another way (public reply, email, intro) if they matter.</p>
+<table>
+  {% for c in closed %}<tr><td><a href="https://x.com/{{ c.username }}" target="_blank">@{{ c.username }}</a></td><td class="small muted">{{ c.last_error or '' }}</td></tr>
+  {% else %}<tr><td class="muted">None.</td></tr>{% endfor %}
+</table>
+{% endblock %}

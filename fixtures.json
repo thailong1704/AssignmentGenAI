@@ -1,0 +1,60 @@
+{
+  "_note": "Fictional accounts for DRY_RUN mode only. Covers: good fits, poor fits, a person with DMs closed (107), someone already messaged outside the tool (108), an AI person with no posts (109 -> generic draft), and simulated replies.",
+  "me": {"id": "900", "username": "genaifund_demo", "name": "GenAI Fund (demo)", "bio": "Building AI ecosystems in Southeast Asia", "followers": 1200},
+  "users": {
+    "100": {"username": "demo_seed_sea", "name": "SEA AI Seed (demo)", "bio": "Investor. AI + robotics in Southeast Asia.", "location": "Singapore", "followers": 15000},
+    "101": {"username": "lin_robotics", "name": "Lin Tan", "bio": "Co-founder @GripLab (fictional). Teaching robot arms to pick messy things. Ex-NUS.", "location": "Singapore", "followers": 3400},
+    "102": {"username": "minh_llm", "name": "Minh Pham", "bio": "Researcher. Small language models for Vietnamese. Opinions my own.", "location": "Hanoi", "followers": 2100},
+    "103": {"username": "devtools_dana", "name": "Dana Reyes", "bio": "Building open-source eval tooling for LLM apps. Manila.", "location": "Manila", "followers": 5200},
+    "104": {"username": "crypto_kev", "name": "Kev", "bio": "Memecoins. 100x or nothing. Not financial advice.", "location": "", "followers": 9800},
+    "105": {"username": "sari_infra", "name": "Sari W.", "bio": "Founder, GPU cloud for SEA startups (fictional). Jakarta.", "location": "Jakarta", "followers": 1800},
+    "106": {"username": "foodie_tom", "name": "Tom", "bio": "Eating my way through Bangkok.", "location": "Bangkok", "followers": 25000},
+    "107": {"username": "arjun_embodied", "name": "Arjun Rao", "bio": "PhD student, embodied AI & legged robots.", "location": "Kuala Lumpur", "followers": 900},
+    "108": {"username": "mai_agents", "name": "Mai Nguyen", "bio": "Founder. AI agents for SME accounting. HCMC.", "location": "Ho Chi Minh City", "followers": 1500},
+    "109": {"username": "paul_ai_quiet", "name": "Paul", "bio": "AI engineer, working on LLM inference.", "location": "Singapore", "followers": 120}
+  },
+  "following": {
+    "100": ["101", "102", "103", "104", "105", "106", "107", "108", "109"]
+  },
+  "tweets": {
+    "101": [
+      {"id": "5001", "text": "Our grasping policy trained only in sim now hits 87% success on deformable objects (bags, cables) on a real UR5. Sim2real gap mostly came from friction randomisation.", "created_at": "2026-11-10T03:12:00Z"},
+      {"id": "5002", "text": "Hiring: robotics engineer in Singapore who likes debugging grippers at 2am.", "created_at": "2026-11-06T09:00:00Z"},
+      {"id": "5003", "text": "Hot take: most embodied AI demos are teleoperated. Ask for the failure videos.", "created_at": "2026-11-02T14:30:00Z"}
+    ],
+    "102": [
+      {"id": "5101", "text": "Released a 1.5B Vietnamese instruction-tuned model. Beats 7B multilingual baselines on our VN reading comprehension set. Weights + eval code open.", "created_at": "2026-11-11T02:00:00Z"},
+      {"id": "5102", "text": "Tokenizers matter more than people think for Vietnamese: diacritics blow up sequence length 30-40% on English-first tokenizers.", "created_at": "2026-11-04T08:20:00Z"}
+    ],
+    "103": [
+      {"id": "5201", "text": "v0.4 of our LLM eval toolkit: regression tests for prompts, runs in CI, flags when a model upgrade silently breaks your app.", "created_at": "2026-11-09T05:45:00Z"},
+      {"id": "5202", "text": "Talked to 30 AI startups in Manila: almost none have evals. They ship on vibes.", "created_at": "2026-11-01T11:10:00Z"}
+    ],
+    "104": [
+      {"id": "5301", "text": "This coin is going to the moon. AI-powered too lol.", "created_at": "2026-11-12T01:00:00Z"}
+    ],
+    "105": [
+      {"id": "5401", "text": "SEA founders pay US prices + latency for GPUs. We just opened H100 capacity in Jakarta with per-minute billing for inference.", "created_at": "2026-11-08T07:30:00Z"}
+    ],
+    "106": [
+      {"id": "5501", "text": "Best khao soi in Bangkok, thread below.", "created_at": "2026-11-12T12:00:00Z"}
+    ],
+    "107": [
+      {"id": "5601", "text": "New paper: learning quadruped locomotion on wet tiles with a 20-minute real-world finetune. Code soon.", "created_at": "2026-11-07T06:00:00Z"}
+    ],
+    "108": [
+      {"id": "5701", "text": "Our agent now reconciles invoices end-to-end for 40 SMEs in HCMC. Biggest lesson: humans must approve payments, always.", "created_at": "2026-11-05T04:00:00Z"}
+    ],
+    "109": []
+  },
+  "dm_closed": ["107"],
+  "existing_conversations": {
+    "108": [
+      {"id": "dm-old-1", "text": "Hi Mai, great meeting you at the HCMC AI meetup!", "sender_id": "900", "created_at": "2026-10-20T10:00:00Z"}
+    ]
+  },
+  "replies": [
+    {"id": "dm-r-1", "sender_id": "101", "text": "Thanks for reaching out! Happy to chat - we're raising in Q1. Free next Tuesday?", "created_at": "2026-11-14T08:00:00Z"},
+    {"id": "dm-r-2", "sender_id": "103", "text": "Appreciate it, but not looking to talk to funds right now.", "created_at": "2026-11-14T09:00:00Z"}
+  ]
+}

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Review drafts</h1>
+<p class="sub">Check why each person fits, open the cited post, edit the message, then approve. Only approved messages are sent.</p>
+
+{% if approved %}
+<div class="card" style="border-color:#2f5d50">
+  <div class="person">
+    <div><b>{{ approved|length }} approved</b> — ready to send. {{ [cap - sent_today, 0]|max }} left under today's cap of {{ cap }}.
+      {% if not dry_run %}<span class="small muted">Messages go out one at a time with a pause between each.</span>{% else %}<span class="small muted">Dry run: nothing will really be sent.</span>{% endif %}</div>
+    <form method="post" action="/send" onsubmit="return confirm('Send {{ approved|length }} approved message(s){{ '' if dry_run else ' from your real X account' }}?')">
+      <button class="primary" {{ 'disabled' if job.running or not acct }}>Send approved</button>
+    </form>
+  </div>
+  <table style="margin-top:10px">
+    {% for c in approved %}
+    <tr><td style="width:170px"><a href="https://x.com/{{ c.username }}" target="_blank">@{{ c.username }}</a></td>
+        <td class="small">{{ c.final_text }}{% if c.last_error %}<div class="warn">{{ c.last_error }}</div>{% endif %}</td>
+        <td style="width:90px"><form method="post" action="/contact/{{ c.id }}/unapprove"><button class="small">Unapprove</button></form></td></tr>
+    {% endfor %}
+  </table>
+</div>
+{% endif %}
+
+{% for c in drafted %}
+<div class="card">
+  <div class="person">
+    <div>
+      <a href="https://x.com/{{ c.username }}" target="_blank">{{ c.name or c.username }} · @{{ c.username }}</a>
+      <span class="pill">{{ c.category }}</span>
+      {% if c.generic %}<span class="pill err">generic — no verified post</span>{% endif %}
+      <div class="small muted">{{ c.bio }}</div>
+      <div class="small muted">{{ c.followers or 0 }} followers · found via {{ c.source }}</div>
+    </div>
+    <div class="score">{{ c.score }}/10</div>
+  </div>
+  <p style="margin:10px 0 4px"><b>Why:</b> {{ c.reason.split('\n⚠')[0] }}</p>
+  {% if '⚠' in (c.reason or '') %}<div class="warn">⚠{{ c.reason.split('⚠', 1)[1] }}</div>{% endif %}
+  {% for e in c.evidence %}
+    <div class="evidence">“{{ e.text }}” — <a href="{{ e.url }}" target="_blank">open post</a></div>
+  {% endfor %}
+  <form method="post" action="/contact/{{ c.id }}/approve">
+    <label>Message <span class="hint" id="n{{ c.id }}">{{ c.draft|length }} chars</span></label>
+    <textarea name="text" oninput="document.getElementById('n{{ c.id }}').textContent=this.value.length+' chars'">{{ c.draft }}</textarea>
+    <div class="actions">
+      <button class="primary">Approve</button>
+      <button formaction="/contact/{{ c.id }}/save">Save edit</button>
+      <button formaction="/contact/{{ c.id }}/reject">Reject</button>
+      <button class="danger" formaction="/contact/{{ c.id }}/dnc" name="back" value="/review">Do not contact</button>
+    </div>
+  </form>
+</div>
+{% else %}
+<div class="card muted">No drafts waiting. Find people on the Home page.</div>
+{% endfor %}
+{% endblock %}

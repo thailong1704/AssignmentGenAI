@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card" style="max-width:640px;margin:40px auto;text-align:center;padding:32px">
+  <h1>Connect your X account</h1>
+  <p class="sub" style="margin-top:8px">Outreach is sent from, and tracked per, the X account you connect. Each account sees only its own people, drafts and history.</p>
+  {% if missing_client %}<div class="flash error">X_CLIENT_ID is missing in .env — see README → "Going live".</div>{% endif %}
+  <a class="btn" href="/connect" style="background:#2f5d50;color:#fff;border-color:#2f5d50;padding:10px 20px">Connect X</a>
+  <p class="small muted" style="margin-top:18px">You'll be sent to X to authorize. The tool asks to read profiles, posts and who accounts follow, and to read and send DMs. It never sees your password.</p>
+</div>
+{% endblock %}

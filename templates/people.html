@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>People</h1>
+<p class="sub">Everyone found but not yet drafted, and everyone skipped or rejected (with the reason).</p>
+
+<h2>Found, not analysed ({{ found|length }})</h2>
+{% if found %}
+<form method="post" action="/analyse" class="card">
+  <label>Campaign focus <span class="hint">optional</span></label><input type="text" name="focus">
+  <label><input type="checkbox" name="include_no_signal" value="1"> Also analyse people with no AI/robotics words in their bio (costs more)</label>
+  <button class="primary" {{ 'disabled' if job.running }}>Analyse {{ found|length }}</button>
+</form>
+<table>{% for c in found %}<tr><td><a href="https://x.com/{{ c.username }}" target="_blank">@{{ c.username }}</a></td><td class="small muted">{{ c.bio }}</td><td class="small muted">{{ c.source }}</td></tr>{% endfor %}</table>
+{% else %}<div class="card muted">None.</div>{% endif %}
+
+<h2>Skipped / rejected ({{ rejected|length }})</h2>
+<table>
+  <tr><th>Person</th><th>Bio</th><th>Why</th><th></th></tr>
+  {% for c in rejected %}
+  <tr><td><a href="https://x.com/{{ c.username }}" target="_blank">@{{ c.username }}</a>{% if c.score is not none %}<div class="small muted">{{ c.score }}/10</div>{% endif %}</td>
+      <td class="small muted">{{ c.bio }}</td>
+      <td class="small">{{ (c.reason or '').split('\n')[0] }}</td>
+      <td><form method="post" action="/contact/{{ c.id }}/restore"><button class="small">Restore</button></form></td></tr>
+  {% else %}<tr><td colspan="4" class="muted">None.</td></tr>{% endfor %}
+</table>
+
+<h2>Already contacted outside this tool?</h2>
+<form class="card" method="post" action="/import" enctype="multipart/form-data">
+  <p class="small muted" style="margin-top:0">Upload a CSV with a <code>username</code> (or <code>user_id</code>) column. Those people go on the do-not-contact list and will never be found or messaged. (Live mode: each username lookup ≈ $0.01.)</p>
+  <input type="file" name="file" accept=".csv" required> <button>Import</button>
+</form>
+{% endblock %}

@@ -1,0 +1,8 @@
+{% if job.name and (job.running or job.log or job.error) %}
+<div class="card" data-running="{{ '1' if job.running else '0' }}" style="border-color:{{ '#b3261e' if job.error else '#2f5d50' }}">
+  <b>{{ job.name }}</b>
+  {% if job.running %}<span class="pill">running…</span>{% elif job.error %}<span class="pill err">stopped</span>{% else %}<span class="pill live">finished</span>{% endif %}
+  {% if job.error %}<div class="flash error" style="margin:8px 0 0">{{ job.error }}</div>{% endif %}
+  {% if job.log %}<div class="joblog">{{ job.log | join('\n') }}</div>{% endif %}
+</div>
+{% endif %}
