@@ -11,7 +11,7 @@ A small local web app that finds AI and robotics builders on X, explains why eac
 **Requirements:** Python 3.10 or newer.
 
 ```bash
-git clone <this repo> && cd outreach
+git clone https://github.com/thailong1704/AssignmentGenAI && cd outreach
 python -m venv .venv
 # Windows: .venv\Scripts\activate     macOS/Linux: source .venv/bin/activate
 pip install -r requirements.txt
